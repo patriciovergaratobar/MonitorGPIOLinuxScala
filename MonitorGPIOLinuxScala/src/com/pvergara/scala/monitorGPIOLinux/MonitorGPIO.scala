@@ -24,9 +24,9 @@ class MonitorGPIO {
    * Method that checks if there are changes of the gpio.
    */
   def checkingChange(gpio: Gpio): Unit = {
-    val valorNuevo = currentStatus(pathSystemGpio(gpio))
+    val newValueGpio = currentStatus(pathSystemGpio(gpio))
     var newStatus = false
-    if (valorNuevo.contains("1")) {
+    if (newValueGpio.contains("1")) {
       newStatus = true;
     }
     val lastValue = lastStates.get(gpio.pin)

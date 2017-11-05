@@ -1,15 +1,15 @@
 package com.pvergara.scala.monitorGPIOLinux.model
 
-case class Gpio(pin: String, statusDefauld: Boolean, callback: Boolean => Unit) {
+trait Status[A]
 
-  var status = statusDefauld
+case class On[A](state: A) extends Status[A] {
+  override def toString: String = "on"
+}
 
-  /**
-   * Function change status of gpio.
-   */
-  def changeStatus(newStatus: Boolean): Unit = {
-    status = newStatus;
-    //Call the function callBack
-    callback(status)
-  }
+case class Off[A](state: A) extends Status[A] {
+  override def toString: String = "off"
+}
+
+case class Gpio(pin: String, status: Status[Boolean]) {
+  override def toString: String = s"Gpio pin =$pin is in status ${status}"
 }

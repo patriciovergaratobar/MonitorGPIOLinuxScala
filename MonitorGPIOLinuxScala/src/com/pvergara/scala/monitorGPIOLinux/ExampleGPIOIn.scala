@@ -17,7 +17,7 @@ object ExampleGPIOIn {
     val gpio82 = Gpio(GpioUtil.GPIO_82, Off(false))
     println(s"MonitorGPIO $gpio57 ready")
     println(s"MonitorGPIO $gpio82 ready")
-    monitorGPIO.startMonitor(List(gpio57, gpio82))
+    monitorGPIO.startMonitor(Map(gpio57.pin -> gpio57, gpio82.pin -> gpio82))
   }
 
 

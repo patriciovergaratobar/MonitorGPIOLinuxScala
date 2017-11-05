@@ -1,57 +1,61 @@
 package com.pvergara.scala.monitorGPIOLinux
 
-import scala.collection._
-import scala.collection.convert.decorateAsScala._
-import java.util.concurrent.ConcurrentHashMap
-import com.pvergara.scala.monitorGPIOLinux.model.Gpio
-import scala.reflect.io.Path
-import scala.reflect.io.File
+import com.pvergara.scala.monitorGPIOLinux.model._
+import com.pvergara.scala.monitorGPIOLinux.utils.GpioUtil._
 
-class MonitorGPIO {
+import scala.concurrent.duration.Duration
 
-  val lastStates: concurrent.Map[String, Gpio] = new ConcurrentHashMap().asScala
+class MonitorGPIO(implicit val timeout: Duration) {
 
-  val PATH_GPIO = "/systest/class/gpio/"
+
+  implicit def callbackGpio(status: Status[Boolean], gpioId: String) = println(s"The new status of $gpioId is $status")
 
   def startMonitor(gpios: List[Gpio]): Unit = {
     while (true) {
-      gpios.foreach(checkingChange)
-      Thread.sleep(10L)
+      for {
+        gpio <- gpios
+        _ <- changeStatus(lastState(gpio, currentStatus(gpio)))
+      } yield ()
+      Thread.sleep(timeout.toMillis)
     }
   }
 
-  /**
-   * Method that checks if there are changes of the gpio.
-   */
-  def checkingChange(gpio: Gpio): Unit = {
-    val newValueGpio = currentStatus(pathSystemGpio(gpio))
-    var newStatus = false
-    if (newValueGpio.contains("1")) {
-      newStatus = true;
-    }
-    val lastValue = lastStates.get(gpio.pin)
-    if (lastStates.contains(gpio.pin).!=(true) || lastValue.get.status.equals(newStatus).!=(true)) {
-      //Thread handles the callbacks of the gpio changes.
-      val threadCallback = new Thread {
-        override def run {
-          //internally call function callback of gpio
-          gpio.changeStatus(newStatus)
-          lastStates.put(gpio.pin, gpio)
-        }
+  def lastState(gpio: Gpio, cs: String): Gpio = {
+    val result = gpio.status match {
+      case On(_) if cs.equals("0") => {
+        //apagar
+        gpio.copy(status = Off(false))
       }
-      threadCallback.start()
+      case Off(_) if cs.equals("1") => {
+        //prender
+        gpio.copy(status = On(true))
+      }
+      case _ => {
+        //apagado y apagar o prendido y prender = no se hace nada
+        println(s"status ${gpio.status} and currentStatus $cs")
+        gpio
+      }
     }
+    result
+  }
 
+
+  def changeStatus(gpio: Gpio) = {
+    callbackGpio(gpio.status, gpio.pin)
+    gpio.pin
   }
 
   /**
-   * Method that obtains the path of the value of a gpio.
-   */
-  def pathSystemGpio(gpio: Gpio): String = PATH_GPIO.concat("gpio").concat(gpio.pin).concat("/value")
+    * Method that obtains the path of the value of a gpio.
+    */
+  implicit def pathSystemGpio: (Gpio => String) =
+    gpio => {
+      PATH_GPIO.concat("gpio").concat(gpio.pin).concat("/value")
+    }
 
   /**
-   * Method that gets the value of the gpio.
-   */
-  def currentStatus(pathGpio: String): String = io.Source.fromFile(pathGpio).getLines.mkString.trim()
+    * Method that gets the value of the gpio.
+    */
+  def currentStatus(gpio: Gpio)(implicit f: Gpio => String): String = io.Source.fromFile(f(gpio)).getLines.mkString.trim()
 
 }

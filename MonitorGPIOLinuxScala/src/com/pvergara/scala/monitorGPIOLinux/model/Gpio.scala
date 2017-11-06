@@ -11,5 +11,5 @@ case class Off[A](state: A) extends Status[A] {
 }
 
 case class Gpio(pin: String, status: Status[Boolean]) {
-  override def toString: String = s"Gpio pin =$pin is in status ${status}"
+  override def toString: String = s"Gpio pin = $pin is in status ${status}"
 }

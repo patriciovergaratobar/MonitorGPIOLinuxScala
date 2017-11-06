@@ -8,41 +8,56 @@ import scala.concurrent.duration.Duration
 class MonitorGPIO(implicit val timeout: Duration) {
 
 
-  implicit def callbackGpio(status: Status[Boolean], gpioId: String) = println(s"The new status of $gpioId is $status")
+  implicit def callbackGpio(gpio: Gpio) = println(s"The new status = $gpio")
 
-  def startMonitor(gpios: List[Gpio]): Unit = {
+  def startMonitor(gpios: Map[String, Gpio]): Unit = {
+    var currentGpios = gpios
     while (true) {
-      for {
-        gpio <- gpios
-        _ <- changeStatus(lastState(gpio, currentStatus(gpio)))
-      } yield ()
+      var changed = for {
+        gpio <- currentGpios.values
+        ls <- lastState(gpio, currentStatus(gpio))
+      } yield (changeStatus(ls))
+      changed.map(gpio => currentGpios = currentGpios.updated(gpio.pin, gpio))
       Thread.sleep(timeout.toMillis)
     }
   }
 
-  def lastState(gpio: Gpio, cs: String): Gpio = {
+  /**
+    * This method returns an optional value, in case the gpio doesnt have changes , the return is None, and if the value
+    * has changes it returns Some
+    *
+    * @param gpio
+    * @param cs
+    * @return
+    */
+  def lastState(gpio: Gpio, cs: String): Option[Gpio] = {
     val result = gpio.status match {
       case On(_) if cs.equals("0") => {
         //apagar
-        gpio.copy(status = Off(false))
+        Some(gpio.copy(status = Off(false)))
       }
       case Off(_) if cs.equals("1") => {
         //prender
-        gpio.copy(status = On(true))
+        Some(gpio.copy(status = On(true)))
       }
       case _ => {
         //apagado y apagar o prendido y prender = no se hace nada
-        println(s"status ${gpio.status} and currentStatus $cs")
-        gpio
+        println(s"The value is the same for ${gpio.pin} - Status ${gpio.status} and currentStatus $cs")
+        None
       }
     }
     result
   }
 
-
-  def changeStatus(gpio: Gpio) = {
-    callbackGpio(gpio.status, gpio.pin)
-    gpio.pin
+  /**
+    * When is Some, execute the callback
+    * Wnen None, only log
+    *
+    * @param gpio
+    */
+  def changeStatus(gpio: Gpio): Gpio = {
+    callbackGpio(gpio)
+    gpio
   }
 
   /**

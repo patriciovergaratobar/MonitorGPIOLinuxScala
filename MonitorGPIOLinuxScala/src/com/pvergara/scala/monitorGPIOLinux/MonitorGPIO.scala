@@ -42,7 +42,7 @@ class MonitorGPIO(implicit val timeout: Duration) {
       }
       case _ => {
         //apagado y apagar o prendido y prender = no se hace nada
-        println(s"The value is the same for ${gpio.pin} - Status ${gpio.status} and currentStatus $cs")
+        //println(s"The value is the same for ${gpio.pin} - Status ${gpio.status} and currentStatus $cs")
         None
       }
     }

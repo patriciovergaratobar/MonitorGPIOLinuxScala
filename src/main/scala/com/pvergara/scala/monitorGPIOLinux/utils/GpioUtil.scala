@@ -19,5 +19,5 @@ object GpioUtil {
   val GPIO_82 = "82"
   val GPIO_163 = "163"
 
-  val PATH_GPIO = "/tmp/gpio/"
+  val PATH_GPIO = "/systest/class/gpio/"
 }

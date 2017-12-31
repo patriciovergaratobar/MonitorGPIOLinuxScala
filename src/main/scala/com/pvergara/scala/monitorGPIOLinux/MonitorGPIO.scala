@@ -1,6 +1,7 @@
 package com.pvergara.scala.monitorGPIOLinux
 
 import com.pvergara.scala.monitorGPIOLinux.model._
+
 import com.pvergara.scala.monitorGPIOLinux.utils.GpioUtil._
 
 import scala.concurrent.duration.Duration
@@ -8,14 +9,14 @@ import scala.concurrent.duration.Duration
 class MonitorGPIO(implicit val timeout: Duration) {
 
 
-  implicit def callbackGpio(gpio: Gpio) = println(s"The new status = $gpio")
+  implicit def callbackGpio(gpio: Gpio) = CallBack.printValue(gpio)
 
   def startMonitor(gpios: Map[String, Gpio]): Unit = {
     var currentGpios = gpios
     while (true) {
       var changed = for {
         gpio <- currentGpios.values
-        ls <- lastState(gpio, currentStatus(gpio))
+        ls <- lastState(gpio, currentStatus(gpio) )
       } yield (changeStatus(ls))
       changed.map(gpio => currentGpios = currentGpios.updated(gpio.pin, gpio))
       Thread.sleep(timeout.toMillis)

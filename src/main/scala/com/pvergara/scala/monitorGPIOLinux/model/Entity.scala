@@ -10,6 +10,10 @@ case class Off[A](state: A) extends Status[A] {
   override def toString: String = "off"
 }
 
-case class Gpio(pin: String, status: Status[Boolean]) {
-  override def toString: String = s"Gpio pin = $pin is in status ${status}"
+case class Gpio(val pin: String, val status: Status[Boolean])  {
+  override def toString: String = s"GpioIn pin = $pin is in status ${status}"
+}
+
+case class Broker(hostBroker: String, identifier: String) {
+  override def toString: String = s"Broker $hostBroker and my identifier $identifier"
 }

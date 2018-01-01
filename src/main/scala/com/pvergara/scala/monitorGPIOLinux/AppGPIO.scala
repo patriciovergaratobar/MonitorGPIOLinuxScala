@@ -1,9 +1,10 @@
 package com.pvergara.scala.monitorGPIOLinux
 
-import com.pvergara.scala.monitorGPIOLinux.model.{Gpio, Off}
+import com.pvergara.scala.monitorGPIOLinux.model.{Broker, Gpio, Off}
 import com.pvergara.scala.monitorGPIOLinux.utils.GpioUtil
 
 import scala.concurrent.duration._
+
 
 /**
   * Created by pvergara on 06-12-17.
@@ -11,8 +12,6 @@ import scala.concurrent.duration._
 object AppGPIO {
 
   implicit def timeout: Duration = 10 millisecond
-
-
 
   def main(args: Array[String]): Unit = {
     val monitorGPIO = new MonitorGPIO()

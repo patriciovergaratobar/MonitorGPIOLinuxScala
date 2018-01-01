@@ -8,9 +8,6 @@ import scala.concurrent.duration.Duration
 
 class MonitorGPIO(implicit val timeout: Duration) {
 
-
-  implicit def callbackGpio(gpio: Gpio) = CallBack.printValue(gpio)
-
   def startMonitor(gpios: Map[String, Gpio]): Unit = {
     var currentGpios = gpios
     while (true) {
@@ -57,7 +54,7 @@ class MonitorGPIO(implicit val timeout: Duration) {
     * @param gpio
     */
   def changeStatus(gpio: Gpio): Gpio = {
-    callbackGpio(gpio)
+    CallBack.execute(gpio)
     gpio
   }
 

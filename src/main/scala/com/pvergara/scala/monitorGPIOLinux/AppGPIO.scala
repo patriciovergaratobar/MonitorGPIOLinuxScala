@@ -1,6 +1,6 @@
 package com.pvergara.scala.monitorGPIOLinux
 
-import com.pvergara.scala.monitorGPIOLinux.model.{Broker, Gpio, Off}
+import com.pvergara.scala.monitorGPIOLinux.model.{Gpio, Off}
 import com.pvergara.scala.monitorGPIOLinux.utils.GpioUtil
 
 import scala.concurrent.duration._

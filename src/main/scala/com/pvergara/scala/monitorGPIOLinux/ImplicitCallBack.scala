@@ -1,7 +1,7 @@
 package com.pvergara.scala.monitorGPIOLinux
 
 import com.pvergara.scala.monitorGPIOLinux.model.{Broker, Gpio}
-import org.eclipse.paho.client.mqttv3.{MqttClient, _}
+import org.eclipse.paho.client.mqttv3.{MqttMessage}
 
 /**
   * Created by pvergara on 31-12-17.

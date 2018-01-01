@@ -16,7 +16,7 @@ object ImplicitCallBack {
   }
 
   implicit object CallbackGpio extends TraitCallBack[Gpio] {
-    def printValue(gpio: Gpio): Unit = println(s" Implicit - The new status = $gpio")
+    def printValue(gpio: Gpio): Unit = println(s"The new status = $gpio")
     def execute(gpio: Gpio): Unit = {
       val subscriber = new MqttSubscriber
       subscriber.publisher(gpio)
@@ -24,7 +24,7 @@ object ImplicitCallBack {
   }
 
   implicit object CallbackMqttMessage extends TraitCallBack[MqttMessage] {
-    def printValue(msg: MqttMessage): Unit = println(s" Implicit - Message = $msg")
+    def printValue(msg: MqttMessage): Unit = println(s"Message = $msg")
     def execute(msg: MqttMessage): Unit = {  }
   }
 

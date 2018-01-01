@@ -1,15 +1,14 @@
-# MonitorGPIOLinuxScala
-GPIO monitor for Linux in Scala. This project is only a test of transition of java to scala.
+# GPIO Monitor for Linux whith Scala
 
-This code is a proof of concept for transferring a idea between Java to Scala.
+This project aims to be an alternative to read gpios with Scala. The project was tested on a Raspberry Pi and an imx.6.
 
-This project is based on the next link: [MonitorGPIOLinux](https://github.com/patriciovergaratobar/MonitorGPIOLinux)
-
+## MonitorGPIOLinuxScala
+This project takes charge of monitoring the change in gpio and send state of gpio to broker ActiveMQ when gpio change status.
 
 Create these paths
 /systest/class/gpio/gpio57/value
 /systest/class/gpio/gpio82/value
 
-y esos solo deben contener un caracter que es 0 o 1
+and only contain a character that is 0 or 1
 
 For humans gpio = General Purpose Input/Outpu

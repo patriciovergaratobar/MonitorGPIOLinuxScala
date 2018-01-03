@@ -4,9 +4,11 @@ import com.pvergara.scala.monitorGPIOLinux.model._
 
 import com.pvergara.scala.monitorGPIOLinux.utils.GpioUtil._
 
+import com.pvergara.scala.monitorGPIOLinux.ImplicitCallBack.TraitCallBack
+
 import scala.concurrent.duration.Duration
 
-class MonitorGPIO(implicit val timeout: Duration) {
+class MonitorGPIO(implicit val timeout: Duration, implicit val callback: TraitCallBack[Gpio]) {
 
   def startMonitor(gpios: Map[String, Gpio]): Unit = {
     var currentGpios = gpios
@@ -54,7 +56,7 @@ class MonitorGPIO(implicit val timeout: Duration) {
     * @param gpio
     */
   def changeStatus(gpio: Gpio): Gpio = {
-    CallBack.execute(gpio)
+    callback.execute(gpio)
     gpio
   }
 

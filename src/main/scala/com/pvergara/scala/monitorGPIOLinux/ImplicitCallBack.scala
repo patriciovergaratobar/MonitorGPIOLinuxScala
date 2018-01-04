@@ -1,14 +1,14 @@
 package com.pvergara.scala.monitorGPIOLinux
 
 import com.pvergara.scala.monitorGPIOLinux.model.{Broker, Gpio}
+import com.pvergara.scala.monitorGPIOLinux.AppGPIO.broker
 import org.eclipse.paho.client.mqttv3.{MqttMessage}
+
 
 /**
   * Created by pvergara on 31-12-17.
   */
 object ImplicitCallBack {
-
-  implicit def broker: Broker = Broker("tcp://localhost:1883", "MonitorGPIOLinuxScala")
 
   trait TraitCallBack[T] {
     def printValue(gpio: T): Unit
@@ -25,7 +25,7 @@ object ImplicitCallBack {
 
   implicit object CallbackMqttMessage extends TraitCallBack[MqttMessage] {
     def printValue(msg: MqttMessage): Unit = println(s"Message = $msg")
-    def execute(msg: MqttMessage): Unit = {  }
+    def execute(msg: MqttMessage): Unit = { println(s"Message = $msg") }
   }
 
 }

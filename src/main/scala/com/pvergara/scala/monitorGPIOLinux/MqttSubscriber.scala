@@ -2,6 +2,7 @@ package com.pvergara.scala.monitorGPIOLinux
 
 import java.util.Calendar
 
+import com.pvergara.scala.monitorGPIOLinux.ImplicitCallBack.TraitCallBack
 import com.pvergara.scala.monitorGPIOLinux.model.{Broker, Gpio}
 import com.pvergara.scala.monitorGPIOLinux.utils.BrokerConnection
 import org.eclipse.paho.client.mqttv3.{MqttClient, _}
@@ -28,6 +29,22 @@ class MqttSubscriber {
     } catch {
       case e: MqttException => println("Exception : " + e)
     }
+  }
+
+  def mqttListener(topics: Array[String])(implicit broker: Broker) : Unit = {
+    //subscriber list topic
+    val mqttConexion = buildMqttClient(broker)
+    mqttConexion.subscribe(topics)
+    val cbListener = new MqttCallback {
+      override def messageArrived(topic: String, message: MqttMessage): Unit = {
+            println(s"Topic : $topic, Message : $message")
+            //callback.execute(message)
+      }
+      override def connectionLost(cause: Throwable): Unit = println(s"Connection Lost by $cause")
+      override def deliveryComplete(token: IMqttDeliveryToken): Unit = {}
+    }
+    mqttConexion.setCallback(cbListener)
+
   }
 
   def buildMqttClient(broker: Broker): MqttClient = {

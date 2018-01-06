@@ -14,7 +14,7 @@ lazy val commonSettings = Seq(
 )
 
 libraryDependencies ++= Seq(
-  "org.eclipse.paho" % "mqtt-client" % "0.4.0",
+  "org.eclipse.paho" % "org.eclipse.paho.client.mqttv3" % "1.0.2",
   "com.typesafe.play" %% "play-json" % "2.6.7",
   "com.typesafe" % "config" % "1.3.1"
 )

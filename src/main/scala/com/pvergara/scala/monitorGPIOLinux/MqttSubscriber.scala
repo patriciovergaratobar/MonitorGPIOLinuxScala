@@ -4,14 +4,14 @@ import java.util.Calendar
 
 import com.pvergara.scala.monitorGPIOLinux.ImplicitCallBack.TraitCallBack
 import com.pvergara.scala.monitorGPIOLinux.model.{Broker, Gpio}
-import com.pvergara.scala.monitorGPIOLinux.utils.BrokerConnection
-import org.eclipse.paho.client.mqttv3.{MqttClient, _}
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
+import org.eclipse.paho.client.mqttv3.{IMqttDeliveryToken, MqttCallback, MqttClient, MqttException, MqttMessage}
 import play.api.libs.json.{Json, Writes}
 
 /**
   * Created by pvergara on 14-12-17.
   */
-class MqttSubscriber {
+class MqttSubscriber extends App {
 
   def publisher(data: Gpio)(implicit broker: Broker) = {
     try {
@@ -23,7 +23,8 @@ class MqttSubscriber {
         )
       }
       val m = Json.toJson(data).toString
-      val topicMqtt = buildMqttClient(broker).getTopic("cl/MonitorGPIO")
+      val mattConnexion = buildMqttClient(broker)
+      val topicMqtt =  mattConnexion.getTopic(broker.topicPublish)
       val msg = new MqttMessage(m.getBytes("utf-8"))
       topicMqtt.publish(msg)
     } catch {
@@ -31,25 +32,27 @@ class MqttSubscriber {
     }
   }
 
-  def mqttListener(topics: Array[String])(implicit broker: Broker) : Unit = {
-    //subscriber list topic
-    val mqttConexion = buildMqttClient(broker)
-    mqttConexion.subscribe(topics)
+  def mqttListener(implicit broker: Broker) : Unit = {
+    val mattConnexion = buildMqttClient(broker)
+    mattConnexion.subscribe(broker.topicReception)
     val cbListener = new MqttCallback {
       override def messageArrived(topic: String, message: MqttMessage): Unit = {
             println(s"Topic : $topic, Message : $message")
-            //callback.execute(message)
+        def callback[T](m: T)(implicit cb: TraitCallBack[T]): Unit = cb.execute(m)
+        callback(message)
       }
       override def connectionLost(cause: Throwable): Unit = println(s"Connection Lost by $cause")
-      override def deliveryComplete(token: IMqttDeliveryToken): Unit = {}
+      override def deliveryComplete(token: IMqttDeliveryToken): Unit = println(s"deliveryComplete by $token")
     }
-    mqttConexion.setCallback(cbListener)
-
+    mattConnexion.setCallback(cbListener)
   }
 
   def buildMqttClient(broker: Broker): MqttClient = {
-    val conn = new BrokerConnection
-    conn.getMqttConection(broker)
+    val persistence = new MemoryPersistence
+    var clientId = MqttClient.generateClientId
+    val clientMqtt = new MqttClient(broker.hostBroker, s"$clientId-${broker.identifier}", persistence)
+    clientMqtt.connect
+    clientMqtt
   }
 
 }

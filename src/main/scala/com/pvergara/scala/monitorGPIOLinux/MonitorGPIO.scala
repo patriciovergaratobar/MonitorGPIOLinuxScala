@@ -12,14 +12,19 @@ class MonitorGPIO(implicit val timeout: Duration, implicit val callback: TraitCa
 
   def startMonitor(gpios: Map[String, Gpio]): Unit = {
     var currentGpios = gpios
-    while (true) {
-      var changed = for {
-        gpio <- currentGpios.values
-        ls <- lastState(gpio, currentStatus(gpio) )
-      } yield (changeStatus(ls))
-      changed.map(gpio => currentGpios = currentGpios.updated(gpio.pin, gpio))
-      Thread.sleep(timeout.toMillis)
+    val thread = new Thread {
+      override def run: Unit = {
+        while (true) {
+          var changed = for {
+            gpio <- currentGpios.values
+            ls <- lastState(gpio, currentStatus(gpio) )
+          } yield (changeStatus(ls))
+          changed.map(gpio => currentGpios = currentGpios.updated(gpio.pin, gpio))
+          Thread.sleep(timeout.toMillis)
+        }
+      }
     }
+    thread.start
   }
 
   /**

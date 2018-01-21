@@ -6,3 +6,5 @@
 bin/
 target/
 project/target
+
+packagedApp/*.jar

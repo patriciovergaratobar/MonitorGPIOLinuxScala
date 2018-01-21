@@ -1,9 +1,12 @@
 package com.pvergara.scala.monitorGPIOLinux
 
 import com.pvergara.scala.monitorGPIOLinux.model.{Broker, Gpio, Off}
+
 import scala.concurrent.duration._
 import com.typesafe.config._
+
 import collection.JavaConversions._
+import java.io._
 
 /**
   * Created by pvergara on 06-12-17.
@@ -12,7 +15,9 @@ object AppGPIO {
 
   implicit def timeout: Duration = 10 millisecond
 
-  val conf = ConfigFactory.load("application.conf")
+  val env = if (System.getenv("GPIO_CONF") == null) "src/main/resources/application.conf" else System.getenv("GPIO_CONF")
+
+  val conf = ConfigFactory.parseFile(new File(env))
 
   implicit def broker: Broker = Broker(
     conf.getString("broker.host"),
@@ -22,6 +27,7 @@ object AppGPIO {
   )
 
   def main(args: Array[String]): Unit = {
+
     val gpios = (
       for (
         item <- conf.getStringList("gpios").toList
@@ -36,6 +42,7 @@ object AppGPIO {
 
     val mqttSubscriber = new MqttSubscriber
     mqttSubscriber.mqttListener
+
   }
 
 }

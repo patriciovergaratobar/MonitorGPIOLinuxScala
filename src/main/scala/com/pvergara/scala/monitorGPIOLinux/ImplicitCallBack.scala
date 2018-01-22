@@ -24,6 +24,7 @@ object ImplicitCallBack {
   }
 
   implicit object CallbackMqttMessage extends TraitCallBack[MqttMessage] {
+    //TODO: shall be carried out a new implementation from this type call back
     def printValue(msg: MqttMessage): Unit = println(s"Message = $msg")
     def execute(msg: MqttMessage): Unit = { println(s"Execute Message = $msg") }
   }
